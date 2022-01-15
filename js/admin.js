@@ -1,25 +1,4 @@
 
-console.log('hello')
-// C3.js
-let chart = c3.generate({
-    bindto: '#chart', // HTML 元素綁定
-    data: {
-        type: "pie",
-        columns: [
-        ['Louvre 雙人床架', 1],
-        ['Antony 雙人床架', 2],
-        ['Anty 雙人床架', 3],
-        ['其他', 4],
-        ],
-        colors:{
-            "Louvre 雙人床架":"#DACBFF",
-            "Antony 雙人床架":"#9D7FEA",
-            "Anty 雙人床架": "#5434A7",
-            "其他": "#301E5F",
-        }
-    },
-});
-
 
 function init(){
     getAdminOrderList()
@@ -46,7 +25,7 @@ function c3Chart(){
     // console.log(total);
     // 整理成c3要得格式
     let c3Obj=Object.keys(total);
-    console.log(c3Obj);
+    // console.log(c3Obj);
     let newAry=[];
     c3Obj.forEach(function(item){
         let itemAry=[];
@@ -54,9 +33,7 @@ function c3Chart(){
         itemAry.push(total[item]);
         newAry.push(itemAry)
     })
-    console.log(newAry)
-
-    
+    // console.log(newAry)
     let chart = c3.generate({
         bindto: '#chart', // HTML 元素綁定
         data: {
@@ -64,6 +41,61 @@ function c3Chart(){
             columns:newAry,
         },
     });
+}
+ 
+
+
+//c3_lv2
+function c3Lv2(){
+    //物件蒐集
+    let total={};
+    adminOrderData.forEach(function(item){
+        // console.log(item)
+        item.products.forEach(function(productItem){
+            // console.log(productItem);
+            if(total[productItem.title]===undefined){
+                total[productItem.title]=productItem.price*productItem.quantity;
+            }
+        })
+    })
+    //整理c3格式
+    let c3Lv2ary=Object.keys(total);
+    // console.log(total)
+    let newAry=[];
+    c3Lv2ary.forEach(function(item){
+        let itemAry=[];
+        itemAry.push(item);
+        itemAry.push(total[item]);
+        // console.log(itemAry);
+        newAry.push(itemAry);
+    })
+    // console.log(newAry)
+    // sort 陣列排序
+    newAry.sort(function(a,b){
+        return b[1]-a[1];
+    })
+    console.log(newAry);
+    if(newAry.length>3){
+        let otherTotal=0;
+        newAry.forEach(function(item,index){
+            if(index>2){
+                otherTotal+=newAry[index][1];
+            }
+        })
+        // console.log(otherTotal)
+        newAry.splice(3,newAry.length-3);
+        // console.log(newAry)
+        newAry.push(['其他', otherTotal])
+        console.log(newAry)
+    }
+    let chart = c3.generate({
+        bindto: '#chart', // HTML 元素綁定
+        data: {
+            type: "pie",
+            columns:newAry,
+        },
+    });
+
 }
 
 
@@ -81,7 +113,7 @@ function getAdminOrderList(){
             //修改時間戳
             const timestamp=new Date(item.createdAt*1000);
             const orderTime=`${timestamp.getFullYear()}/${timestamp.getMonth()+1}/${timestamp.getDate()}`;
-            console.log(orderTime)
+            // console.log(orderTime)
             // 修改paid狀態
             let paidStatus="";
             if(item.paid===true){
@@ -115,7 +147,8 @@ function getAdminOrderList(){
         </tr>`
         })
         orderList.innerHTML=str;
-        c3Chart();
+        c3Lv2();
+        // c3Chart();
     })
 }
 

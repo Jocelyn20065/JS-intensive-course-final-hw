@@ -45,12 +45,6 @@ function renderProductList(){
   })
   productList.innerHTML=str;
 }
-  // 小工具: 價格數字添加分號
-function toCurrency(num){
-    let parts = num.toString().split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return parts.join('.');
-} //參考網址:https://dotblogs.com.tw/AlenWu_coding_blog/2017/08/11/js_number_to_currency_comma
 
 // 篩選器邏輯
 
@@ -161,6 +155,14 @@ discardAllBtn.addEventListener('click',function(e){
 
 //送出訂單
 const orderInfoBtn=document.querySelector('.orderInfo-btn');
+const orderInfoForm=document.querySelector('.orderInfo-form');
+const inputs = document.querySelectorAll("input[name],select[data=payment]");
+const customerName=document.querySelector('#customerName').value;
+const customerPhone=document.querySelector('#customerPhone').value;
+const customerEmail=document.querySelector('#customerEmail').value;
+const customerAddress=document.querySelector('#customerAddress').value;
+const tradeWay=document.querySelector('#tradeWay').value;
+
 orderInfoBtn.addEventListener('click',function(e){
   e.preventDefault();
   // console.log('點擊到了');
@@ -168,12 +170,7 @@ orderInfoBtn.addEventListener('click',function(e){
     alert('購物車內沒有東西')
     return;
   }
-  const orderInfoForm=document.querySelector('.orderInfo-form')
-  const customerName=document.querySelector('#customerName').value;
-  const customerPhone=document.querySelector('#customerPhone').value;
-  const customerEmail=document.querySelector('#customerEmail').value;
-  const customerAddress=document.querySelector('#customerAddress').value;
-  const tradeWay=document.querySelector('#tradeWay').value;
+  //如果有空白就無法送出
   if (customerName==="" || customerPhone==="" || customerEmail==="" || customerAddress==="" || tradeWay===""){
     alert('訂單資訊有缺少')
     return
@@ -198,3 +195,64 @@ orderInfoBtn.addEventListener('click',function(e){
     })
 
 })
+
+//validate
+const constraints = {
+  "姓名": {
+    presence: {
+      message: "必填欄位"
+    }
+  },
+  "電話": {
+    presence: {
+      message: "必填欄位"
+    },
+    format: {
+      pattern:'^09\\d{8}$',
+      message: "請輸入正確電話格式"
+    }
+  },
+  "信箱": {
+    presence: {
+      message: "必填欄位"
+    },
+    email: {
+      message: "格式錯誤"
+    },
+  },
+  "寄送地址": {
+    presence: {
+      message: "必填欄位"
+    }
+  },
+  "交易方式": {
+    presence: {
+      message: "必填欄位"
+    }
+  },
+};
+inputs.forEach(function(item){
+  item.addEventListener('input',function(){
+    item.nextElementSibling.textContent = '';
+    let error=validate(orderInfoForm,constraints) || "";
+    if(error){
+      Object.keys(error).forEach(function(key){
+        // console.log(key)
+        // console.log(document.querySelector(`[data-message=${key}]`))
+        document.querySelector(`[data-message=${key}]`).textContent=error[key];
+      })
+    }
+  })
+})
+
+
+
+  // 小工具: 價格數字添加分號
+function toCurrency(num){
+    let parts = num.toString().split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+} //參考網址:https://dotblogs.com.tw/AlenWu_coding_blog/2017/08/11/js_number_to_currency_comma
+
+
+
